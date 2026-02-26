@@ -2,8 +2,36 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pay Tracker">
+<meta name="theme-color" content="#0d0f14">
+<meta name="description" content="Delivery Pay Tracker - Track your daily earnings and expenses">
 <title>Delivery Pay Tracker</title>
+
+<!-- PWA Manifest inline via JS -->
+<script>
+  const manifestData = {
+    name: "Delivery Pay Tracker",
+    short_name: "Pay Tracker",
+    description: "Track your delivery earnings and expenses",
+    start_url: "./",
+    display: "standalone",
+    background_color: "#0d0f14",
+    theme_color: "#0d0f14",
+    orientation: "portrait",
+    icons: [
+      { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%230d0f14'/><text y='130' x='20' font-size='120' font-family='Arial'>💵</text></svg>", sizes: "192x192", type: "image/svg+xml" },
+      { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%230d0f14'/><text y='360' x='40' font-size='320' font-family='Arial'>💵</text></svg>", sizes: "512x512", type: "image/svg+xml" }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
+  const manifestURL = URL.createObjectURL(blob);
+  document.write('<link rel="manifest" href="' + manifestURL + '">');
+</script>
+
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -21,17 +49,19 @@
     --yellow: #f0c040;
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
   body {
     background: var(--bg);
     color: var(--text);
     font-family: 'DM Sans', sans-serif;
     min-height: 100vh;
-    padding: 24px 16px 60px;
+    min-height: -webkit-fill-available;
+    padding: 24px 16px 80px;
+    padding-top: max(24px, env(safe-area-inset-top));
+    padding-bottom: max(80px, env(safe-area-inset-bottom));
   }
 
-  /* Background texture */
   body::before {
     content: '';
     position: fixed;
@@ -44,6 +74,67 @@
   }
 
   .container { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; }
+
+  /* Install banner */
+  .install-banner {
+    display: none;
+    background: linear-gradient(135deg, rgba(240,192,64,0.15), rgba(74,240,160,0.1));
+    border: 1px solid rgba(240,192,64,0.3);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .install-banner.show { display: flex; }
+
+  .install-banner p {
+    font-size: 13px;
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    flex: 1;
+  }
+
+  .install-btn {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .install-dismiss {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 4px;
+  }
+
+  /* Offline banner */
+  .offline-banner {
+    display: none;
+    background: rgba(240,80,96,0.1);
+    border: 1px solid rgba(240,80,96,0.3);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    font-size: 12px;
+    color: var(--red);
+    font-family: 'DM Mono', monospace;
+    text-align: center;
+  }
+
+  .offline-banner.show { display: block; }
 
   /* Header */
   .header {
@@ -73,9 +164,7 @@
     letter-spacing: 1px;
   }
 
-  .header-right {
-    text-align: right;
-  }
+  .header-right { text-align: right; }
 
   .total-label {
     font-family: 'DM Mono', monospace;
@@ -96,7 +185,7 @@
   /* Summary cards */
   .summary-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
     margin-bottom: 28px;
   }
@@ -133,7 +222,7 @@
 
   .summary-card .s-value {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 30px;
+    font-size: 28px;
     letter-spacing: 1px;
   }
 
@@ -142,250 +231,8 @@
   .summary-card.expense .s-value { color: var(--red); }
   .summary-card.balance .s-value { color: #7a8fff; }
 
-  /* Cycles */
-  .cycle {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    margin-bottom: 20px;
-    overflow: hidden;
-    transition: border-color 0.2s;
-  }
-
-  .cycle:hover { border-color: #3a4060; }
-
-  .cycle-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px;
-    cursor: pointer;
-    background: var(--surface);
-    user-select: none;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .cycle-header:hover { background: var(--surface2); }
-
-  .cycle-title {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .cycle-num {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 13px;
-    background: var(--accent);
-    color: #000;
-    width: 28px; height: 28px;
-    border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    letter-spacing: 1px;
-  }
-
-  .cycle-dates {
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    color: var(--muted);
-  }
-
-  .cycle-payday {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--accent);
-  }
-
-  .cycle-chips {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-
-  .chip {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-weight: 500;
-  }
-
-  .chip.expected { background: rgba(240,192,64,0.12); color: var(--accent); border: 1px solid rgba(240,192,64,0.25); }
-  .chip.actual { background: rgba(74,240,160,0.12); color: var(--accent2); border: 1px solid rgba(74,240,160,0.25); }
-  .chip.balance { background: rgba(122,143,255,0.12); color: #7a8fff; border: 1px solid rgba(122,143,255,0.25); }
-
-  .chevron {
-    color: var(--muted);
-    font-size: 18px;
-    transition: transform 0.25s;
-  }
-
-  .cycle.open .chevron { transform: rotate(180deg); }
-
-  .cycle-body {
-    display: none;
-    border-top: 1px solid var(--border);
-  }
-
-  .cycle.open .cycle-body { display: block; }
-
-  /* Day table */
-  .day-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .day-table th {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--muted);
-    padding: 12px 20px 8px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .day-table td {
-    padding: 10px 20px;
-    font-size: 14px;
-    border-bottom: 1px solid rgba(42,48,69,0.5);
-  }
-
-  .day-table tr:last-child td { border-bottom: none; }
-
-  .day-table tr.off-day td { opacity: 0.6; }
-  .day-table tr.no-work td { opacity: 0.5; }
-  .day-table tr.no-work .day-badge { background: rgba(240,80,96,0.15); color: var(--red); }
-
-  .day-badge {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    padding: 3px 8px;
-    border-radius: 4px;
-    background: var(--surface2);
-    color: var(--muted);
-  }
-
-  .day-badge.off { background: rgba(240,192,64,0.1); color: var(--yellow); }
-
-  .earn-expected { color: var(--accent); font-family: 'DM Mono', monospace; font-size: 13px; }
-  .earn-actual-input {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--accent2);
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    padding: 4px 8px;
-    width: 90px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
-  .earn-actual-input:focus { border-color: var(--accent2); }
-  .earn-actual-input::placeholder { color: var(--muted); }
-
-  .note-text {
-    font-size: 11px;
-    color: var(--red);
-    font-family: 'DM Mono', monospace;
-  }
-
-  /* Expense section */
-  .expense-section {
-    border-top: 1px solid var(--border);
-    padding: 16px 20px;
-    background: rgba(0,0,0,0.2);
-  }
-
-  .expense-section h4 {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 12px;
-  }
-
-  .expense-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-
-  .expense-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 13px;
-    background: var(--surface2);
-    padding: 8px 12px;
-    border-radius: 8px;
-  }
-
-  .expense-row .e-label { color: var(--muted); }
-  .expense-row .e-amount { color: var(--red); font-family: 'DM Mono', monospace; }
-  .expense-row .e-amount.special { color: #ff8c60; font-weight: 600; }
-
-  /* Cycle totals */
-  .cycle-totals {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 10px;
-    margin-top: 8px;
-    padding-top: 14px;
-    border-top: 1px dashed var(--border);
-  }
-
-  .total-row {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .total-row .t-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  .total-row .t-val {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 24px;
-    letter-spacing: 1px;
-  }
-
-  .t-val.bf { color: #7a8fff; }
-  .t-val.earned { color: var(--accent); }
-  .t-val.actual { color: var(--accent2); }
-  .t-val.deducted { color: var(--red); }
-  .t-val.balance { color: #c8a8ff; }
-
-  /* Warning banner */
-  .warning {
-    background: rgba(240,80,96,0.08);
-    border: 1px solid rgba(240,80,96,0.3);
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 12px;
-    color: var(--red);
-    font-family: 'DM Mono', monospace;
-    margin-bottom: 10px;
-    display: flex;
-    gap: 8px;
-    align-items: flex-start;
-  }
-
-  /* Progress bar */
-  .progress-wrap {
-    margin: 20px 0 28px;
-  }
+  /* Progress */
+  .progress-wrap { margin: 0 0 28px; }
 
   .progress-label {
     display: flex;
@@ -408,37 +255,265 @@
     height: 100%;
     background: linear-gradient(90deg, var(--accent2), var(--accent));
     border-radius: 4px;
-    transition: width 0.8s ease;
+    transition: width 0.6s ease;
+  }
+
+  /* Cycles */
+  .cycle {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .cycle-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    cursor: pointer;
+    user-select: none;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .cycle-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .cycle-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    background: var(--accent);
+    color: #000;
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .cycle-info { min-width: 0; }
+  .cycle-info .ci-title { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cycle-dates { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
+
+  .cycle-chips {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .chip {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .chip.expected { background: rgba(240,192,64,0.12); color: var(--accent); border: 1px solid rgba(240,192,64,0.25); }
+  .chip.actual { background: rgba(74,240,160,0.12); color: var(--accent2); border: 1px solid rgba(74,240,160,0.25); }
+  .chip.balance { background: rgba(122,143,255,0.12); color: #7a8fff; border: 1px solid rgba(122,143,255,0.25); }
+
+  .chevron { color: var(--muted); font-size: 16px; transition: transform 0.25s; flex-shrink: 0; }
+  .cycle.open .chevron { transform: rotate(180deg); }
+
+  .cycle-body { display: none; border-top: 1px solid var(--border); }
+  .cycle.open .cycle-body { display: block; }
+
+  /* Day table */
+  .day-table { width: 100%; border-collapse: collapse; }
+
+  .day-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 10px 12px 8px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .day-table td {
+    padding: 10px 12px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(42,48,69,0.5);
+    vertical-align: middle;
+  }
+
+  .day-table tr:last-child td { border-bottom: none; }
+  .day-table tr.off-day td { opacity: 0.65; }
+  .day-table tr.no-work td { opacity: 0.45; }
+  .day-table tr.no-work .day-badge { background: rgba(240,80,96,0.15); color: var(--red); }
+
+  .day-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 3px 7px;
+    border-radius: 4px;
+    background: var(--surface2);
+    color: var(--muted);
+  }
+
+  .day-badge.off { background: rgba(240,192,64,0.1); color: var(--yellow); }
+
+  .earn-expected { color: var(--accent); font-family: 'DM Mono', monospace; font-size: 13px; }
+
+  .earn-actual-input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--accent2);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    padding: 5px 8px;
+    width: 80px;
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+
+  .earn-actual-input:focus { border-color: var(--accent2); }
+  .earn-actual-input::placeholder { color: var(--muted); }
+
+  .note-text { font-size: 10px; color: var(--red); font-family: 'DM Mono', monospace; display: block; }
+
+  /* Expense section */
+  .expense-section {
+    border-top: 1px solid var(--border);
+    padding: 14px 16px;
+    background: rgba(0,0,0,0.2);
+  }
+
+  .expense-section h4 {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .expense-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .expense-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    background: var(--surface2);
+    padding: 8px 10px;
+    border-radius: 8px;
+    gap: 6px;
+  }
+
+  .expense-row .e-label { color: var(--muted); font-size: 11px; }
+  .expense-row .e-amount { color: var(--red); font-family: 'DM Mono', monospace; font-size: 12px; white-space: nowrap; }
+  .expense-row .e-amount.special { color: #ff8c60; font-weight: 600; }
+
+  /* Cycle totals */
+  .cycle-totals {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 8px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+
+  .total-row { display: flex; flex-direction: column; gap: 2px; }
+
+  .total-row .t-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .total-row .t-val { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; }
+  .t-val.bf { color: #7a8fff; }
+  .t-val.earned { color: var(--accent); }
+  .t-val.actual { color: var(--accent2); }
+  .t-val.deducted { color: var(--red); }
+  .t-val.balance { color: #c8a8ff; }
+
+  /* Warning */
+  .warning {
+    background: rgba(240,80,96,0.08);
+    border: 1px solid rgba(240,80,96,0.3);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--red);
+    font-family: 'DM Mono', monospace;
+    margin: 12px 12px 0;
   }
 
   /* Footer */
   .footer-note {
     text-align: center;
     font-family: 'DM Mono', monospace;
-    font-size: 11px;
+    font-size: 10px;
     color: var(--muted);
     margin-top: 32px;
     letter-spacing: 1px;
+    padding-bottom: 20px;
   }
 
-  @media (max-width: 500px) {
-    .header-left h1 { font-size: 38px; }
-    .total-amount { font-size: 32px; }
-    .day-table th, .day-table td { padding: 8px 12px; }
+  /* Saved toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--accent2);
+    color: #000;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    padding: 10px 20px;
+    border-radius: 20px;
+    z-index: 999;
+    transition: transform 0.3s ease;
+    white-space: nowrap;
   }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
 <div class="container">
 
+  <!-- Install Banner -->
+  <div class="install-banner" id="install-banner">
+    <p>📱 Add to Home Screen for app experience!</p>
+    <button class="install-btn" id="install-btn">INSTALL</button>
+    <button class="install-dismiss" id="install-dismiss">✕</button>
+  </div>
+
+  <!-- Offline Banner -->
+  <div class="offline-banner" id="offline-banner">📵 You're offline — data is saved locally</div>
+
   <!-- Header -->
   <div class="header">
     <div class="header-left">
       <h1>PAY TRACKER</h1>
-      <p>26 FEB → 1 APR 2026 · DELIVERY</p>
+      <p>26 FEB → 1 APR 2026</p>
     </div>
     <div class="header-right">
-      <div class="total-label">Balance on 1 Apr</div>
+      <div class="total-label">Balance 1 Apr</div>
       <div class="total-amount" id="grand-balance">$2,336</div>
     </div>
   </div>
@@ -446,15 +521,15 @@
   <!-- Summary Cards -->
   <div class="summary-grid">
     <div class="summary-card earn">
-      <div class="s-label">Expected Earn</div>
+      <div class="s-label">Expected</div>
       <div class="s-value" id="s-expected">$5,300</div>
     </div>
     <div class="summary-card actual">
-      <div class="s-label">Actual Earn</div>
+      <div class="s-label">Actual</div>
       <div class="s-value" id="s-actual">$0</div>
     </div>
     <div class="summary-card expense">
-      <div class="s-label">Total Expenses</div>
+      <div class="s-label">Expenses</div>
       <div class="s-value" id="s-expense">$2,964</div>
     </div>
     <div class="summary-card balance">
@@ -466,7 +541,7 @@
   <!-- Progress -->
   <div class="progress-wrap">
     <div class="progress-label">
-      <span>PROGRESS TO 1 APR</span>
+      <span>ACTUAL VS EXPECTED</span>
       <span id="progress-pct">0%</span>
     </div>
     <div class="progress-bar">
@@ -474,24 +549,91 @@
     </div>
   </div>
 
-  <!-- Cycles will be injected here -->
+  <!-- Cycles -->
   <div id="cycles-container"></div>
 
-  <div class="footer-note">⚡ TAP CYCLE HEADER TO EXPAND · ENTER ACTUAL DAILY INCOME TO TRACK</div>
+  <div class="footer-note">💾 DATA SAVED AUTOMATICALLY · TAP CYCLE TO EXPAND</div>
 </div>
 
-<script>
-// ─── DATA ───────────────────────────────────────────────────────────────────
+<!-- Toast -->
+<div class="toast" id="toast">✓ Saved</div>
 
-const DAILY_EXP = 48; // cigs $18 + food $20 + petrol avg $10
+<script>
+// ─── PWA SERVICE WORKER ──────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'pay-tracker-v1';
+    const ASSETS = [self.location.href];
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
+      self.skipWaiting();
+    });
+    self.addEventListener('activate', e => {
+      e.waitUntil(caches.keys().then(keys =>
+        Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+      ));
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(
+        caches.match(e.request).then(r => r || fetch(e.request).then(res => {
+          const clone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+          return res;
+        }).catch(() => caches.match(e.request)))
+      );
+    });
+  `;
+  const blob = new Blob([swCode], {type: 'application/javascript'});
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(() => {});
+}
+
+// ─── INSTALL PROMPT ──────────────────────────────────────────────────────────
+let deferredPrompt;
+const installBanner = document.getElementById('install-banner');
+const installBtn = document.getElementById('install-btn');
+const dismissBtn = document.getElementById('install-dismiss');
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installBanner.classList.add('show');
+});
+
+installBtn.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  installBanner.classList.remove('show');
+});
+
+dismissBtn.addEventListener('click', () => installBanner.classList.remove('show'));
+
+// ─── OFFLINE DETECTION ───────────────────────────────────────────────────────
+const offlineBanner = document.getElementById('offline-banner');
+function updateOnline() {
+  offlineBanner.classList.toggle('show', !navigator.onLine);
+}
+window.addEventListener('online', updateOnline);
+window.addEventListener('offline', updateOnline);
+updateOnline();
+
+// ─── TOAST ───────────────────────────────────────────────────────────────────
+function showToast(msg = '✓ Saved') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// ─── DATA ────────────────────────────────────────────────────────────────────
+const DAILY_EXP = 48;
 const WIFE = 50;
 
 const cycles = [
   {
-    num: 1,
-    label: "Cycle 1",
-    dates: "26 Feb – 1 Mar",
-    payday: "Wed 4 Mar",
+    num: 1, label: "Cycle 1", dates: "26 Feb – 1 Mar", payday: "Wed 4 Mar",
     days: [
       { date: "26 Feb", day: "Wed", type: "work" },
       { date: "27 Feb", day: "Thu", type: "work" },
@@ -499,15 +641,10 @@ const cycles = [
       { date: "1 Mar",  day: "Sat", type: "work" },
       { date: "2 Mar",  day: "Sun", type: "off" },
     ],
-    expenseDays: 5,
-    extras: [],
-    warning: null
+    expenseDays: 5, extras: [], warning: null
   },
   {
-    num: 2,
-    label: "Cycle 2",
-    dates: "2 Mar – 8 Mar",
-    payday: "Wed 11 Mar",
+    num: 2, label: "Cycle 2", dates: "2 Mar – 8 Mar", payday: "Wed 11 Mar",
     days: [
       { date: "2 Mar",  day: "Mon", type: "work" },
       { date: "3 Mar",  day: "Tue", type: "work" },
@@ -518,16 +655,11 @@ const cycles = [
       { date: "8 Mar",  day: "Sun", type: "off" },
     ],
     expenseDays: 8,
-    extras: [
-      { label: "🏍️ Bike Payment (10 Mar)", amount: 450 }
-    ],
-    warning: "⚠️  Bike payment $450 due 10 Mar. Don't overspend after 4 Mar payday!"
+    extras: [{ label: "🏍️ Bike Payment (10 Mar)", amount: 450 }],
+    warning: "Bike payment $450 due 10 Mar. Don't overspend after 4 Mar payday!"
   },
   {
-    num: 3,
-    label: "Cycle 3",
-    dates: "9 Mar – 15 Mar",
-    payday: "Wed 18 Mar",
+    num: 3, label: "Cycle 3", dates: "9 Mar – 15 Mar", payday: "Wed 18 Mar",
     days: [
       { date: "9 Mar",  day: "Mon", type: "work" },
       { date: "10 Mar", day: "Tue", type: "work" },
@@ -538,16 +670,11 @@ const cycles = [
       { date: "15 Mar", day: "Sun", type: "off" },
     ],
     expenseDays: 8,
-    extras: [
-      { label: "💳 Loan Payment (12 Mar)", amount: 188 }
-    ],
+    extras: [{ label: "💳 Loan Payment (12 Mar)", amount: 188 }],
     warning: null
   },
   {
-    num: 4,
-    label: "Cycle 4",
-    dates: "16 Mar – 22 Mar",
-    payday: "Wed 25 Mar",
+    num: 4, label: "Cycle 4", dates: "16 Mar – 22 Mar", payday: "Wed 25 Mar",
     days: [
       { date: "16 Mar", day: "Mon", type: "work" },
       { date: "17 Mar", day: "Tue", type: "work" },
@@ -558,265 +685,10 @@ const cycles = [
       { date: "22 Mar", day: "Sun", type: "off" },
     ],
     expenseDays: 8,
-    extras: [
-      { label: "✈️  Batam Trip (24–26 Mar)", amount: 300 }
-    ],
+    extras: [{ label: "✈️ Batam Trip (24–26 Mar)", amount: 300 }],
     warning: null
   },
   {
-    num: 5,
-    label: "Cycle 5",
-    dates: "23 Mar – 29 Mar",
-    payday: "Wed 1 Apr",
+    num: 5, label: "Cycle 5", dates: "23 Mar – 29 Mar", payday: "Wed 1 Apr",
     days: [
-      { date: "23 Mar", day: "Mon", type: "work" },
-      { date: "24 Mar", day: "Tue", type: "nowork", note: "Batam Day 1" },
-      { date: "25 Mar", day: "Wed", type: "nowork", note: "Batam Day 2" },
-      { date: "26 Mar", day: "Thu", type: "nowork", note: "Batam Day 3" },
-      { date: "27 Mar", day: "Fri", type: "work" },
-      { date: "28 Mar", day: "Sat", type: "work" },
-      { date: "29 Mar", day: "Sun", type: "off" },
-    ],
-    expenseDays: 8,
-    extras: [],
-    warning: "⚠️  Only 4 earning days this cycle due to Batam trip."
-  }
-];
-
-// Calculate expected earnings per day
-function expectedEarn(type) {
-  if (type === "work") return 200;
-  if (type === "off") return 100;
-  return 0;
-}
-
-// ─── STATE ──────────────────────────────────────────────────────────────────
-// actual[cycleIndex][dayIndex] = number or null
-const actual = cycles.map(c => c.days.map(() => null));
-
-// Load from localStorage if available
-try {
-  const saved = localStorage.getItem("delivery_tracker_v1");
-  if (saved) {
-    const parsed = JSON.parse(saved);
-    parsed.forEach((row, ci) => row.forEach((val, di) => {
-      if (actual[ci] && actual[ci][di] !== undefined) actual[ci][di] = val;
-    }));
-  }
-} catch(e) {}
-
-function save() {
-  try { localStorage.setItem("delivery_tracker_v1", JSON.stringify(actual)); } catch(e) {}
-}
-
-// ─── CALCULATIONS ───────────────────────────────────────────────────────────
-
-function calcCycle(ci) {
-  const c = cycles[ci];
-  const expExp = c.days.reduce((s, d) => s + expectedEarn(d.type), 0);
-  const actEarn = actual[ci].reduce((s, v) => s + (v !== null ? v : 0), 0);
-  const hasActual = actual[ci].some(v => v !== null);
-  const totalExp = (DAILY_EXP * c.expenseDays) + WIFE + c.extras.reduce((s, e) => s + e.amount, 0);
-  return { expExp, actEarn, hasActual, totalExp };
-}
-
-function calcAllBalances() {
-  let bf = 0;
-  const results = [];
-  cycles.forEach((c, ci) => {
-    const { expExp, actEarn, hasActual, totalExp } = calcCycle(ci);
-    const earned = hasActual ? actEarn : expExp;
-    const balance = bf + earned - totalExp;
-    results.push({ bf, earned, expExp, actEarn, hasActual, totalExp, balance });
-    bf = balance;
-  });
-  return results;
-}
-
-// ─── RENDER ─────────────────────────────────────────────────────────────────
-
-function render() {
-  const balances = calcAllBalances();
-  const container = document.getElementById("cycles-container");
-  container.innerHTML = "";
-
-  let totalExpected = 0, totalActual = 0, totalExpenses = 0;
-  cycles.forEach((c, ci) => {
-    const { expExp, actEarn, hasActual, totalExp } = calcCycle(ci);
-    totalExpected += expExp;
-    totalActual += actEarn;
-    totalExpenses += totalExp;
-  });
-
-  const finalBalance = balances[balances.length - 1].balance;
-
-  // Update summary
-  document.getElementById("s-expected").textContent = "$" + totalExpected.toLocaleString();
-  document.getElementById("s-actual").textContent = "$" + totalActual.toLocaleString();
-  document.getElementById("s-expense").textContent = "$" + totalExpenses.toLocaleString();
-  document.getElementById("s-balance").textContent = "$" + Math.round(finalBalance).toLocaleString();
-  document.getElementById("grand-balance").textContent = "$" + Math.round(finalBalance).toLocaleString();
-
-  // Progress
-  const pct = Math.min(100, Math.round((totalActual / totalExpected) * 100));
-  document.getElementById("progress-pct").textContent = pct + "%";
-  document.getElementById("progress-fill").style.width = pct + "%";
-
-  // Render cycles
-  cycles.forEach((c, ci) => {
-    const b = balances[ci];
-    const div = document.createElement("div");
-    div.className = "cycle";
-    div.id = "cycle-" + ci;
-
-    // Warning
-    const warnHTML = c.warning ? `<div class="warning">⚠ ${c.warning}</div>` : "";
-
-    // Day rows
-    const dayRows = c.days.map((d, di) => {
-      const exp = expectedEarn(d.type);
-      const actVal = actual[ci][di];
-      const isNoWork = d.type === "nowork";
-      const isOff = d.type === "off";
-      const rowClass = isNoWork ? "no-work" : isOff ? "off-day" : "";
-      const badgeClass = isOff ? "off" : "";
-      const noteHTML = d.note ? `<span class="note-text">${d.note}</span>` : "";
-      const inputHTML = isNoWork ? `<span style="color:var(--red);font-family:'DM Mono',monospace;font-size:13px;">$0</span>` :
-        `<input class="earn-actual-input" type="number" placeholder="—" 
-          data-ci="${ci}" data-di="${di}"
-          value="${actVal !== null ? actVal : ''}"
-          min="0" step="1">`;
-      return `
-        <tr class="${rowClass}">
-          <td><span class="day-badge ${badgeClass}">${d.day}</span></td>
-          <td style="color:var(--muted);font-size:13px;">${d.date} ${noteHTML}</td>
-          <td class="earn-expected">$${exp}</td>
-          <td>${inputHTML}</td>
-        </tr>`;
-    }).join("");
-
-    // Expense rows
-    const expRowsHTML = c.extras.map(e =>
-      `<div class="expense-row"><span class="e-label">${e.label}</span><span class="e-amount special">−$${e.amount}</span></div>`
-    ).join("");
-
-    const dailyExpTotal = DAILY_EXP * c.expenseDays;
-
-    div.innerHTML = `
-      <div class="cycle-header" onclick="toggleCycle(${ci})">
-        <div class="cycle-title">
-          <div class="cycle-num">${c.num}</div>
-          <div>
-            <div style="font-weight:600;font-size:14px;">${c.label} · ${c.dates}</div>
-            <div class="cycle-dates">Payday: ${c.payday}</div>
-          </div>
-        </div>
-        <div class="cycle-chips">
-          <span class="chip expected">Exp $${b.expExp}</span>
-          <span class="chip actual">Act $${b.actEarn}</span>
-          <span class="chip balance">Bal $${Math.round(b.balance)}</span>
-        </div>
-        <div class="chevron">▾</div>
-      </div>
-      <div class="cycle-body">
-        ${warnHTML}
-        <table class="day-table">
-          <thead>
-            <tr>
-              <th>Day</th>
-              <th>Date</th>
-              <th>Expected</th>
-              <th>Actual</th>
-            </tr>
-          </thead>
-          <tbody>${dayRows}</tbody>
-        </table>
-
-        <div class="expense-section">
-          <h4>Expenses (${c.expenseDays} days to next payday)</h4>
-          <div class="expense-grid">
-            <div class="expense-row">
-              <span class="e-label">🚬 Cigarettes ($18×${c.expenseDays}d)</span>
-              <span class="e-amount">−$${18 * c.expenseDays}</span>
-            </div>
-            <div class="expense-row">
-              <span class="e-label">🍱 Food ($20×${c.expenseDays}d)</span>
-              <span class="e-amount">−$${20 * c.expenseDays}</span>
-            </div>
-            <div class="expense-row">
-              <span class="e-label">⛽ Petrol ($10avg×${c.expenseDays}d)</span>
-              <span class="e-amount">−$${10 * c.expenseDays}</span>
-            </div>
-            <div class="expense-row">
-              <span class="e-label">💑 Wife spending</span>
-              <span class="e-amount">−$${WIFE}</span>
-            </div>
-            ${expRowsHTML}
-          </div>
-
-          <div class="cycle-totals">
-            <div class="total-row">
-              <span class="t-label">Bring Forward</span>
-              <span class="t-val bf">$${Math.round(b.bf)}</span>
-            </div>
-            <div class="total-row">
-              <span class="t-label">Expected Earn</span>
-              <span class="t-val earned">$${b.expExp}</span>
-            </div>
-            <div class="total-row">
-              <span class="t-label">Actual Earn</span>
-              <span class="t-val actual">$${b.actEarn}</span>
-            </div>
-            <div class="total-row">
-              <span class="t-label">Total Deducted</span>
-              <span class="t-val deducted">−$${b.totalExp}</span>
-            </div>
-            <div class="total-row">
-              <span class="t-label">Balance After Pay</span>
-              <span class="t-val balance">$${Math.round(b.balance)}</span>
-            </div>
-          </div>
-        </div>
-      </div>`;
-
-    container.appendChild(div);
-  });
-
-  // Re-attach input listeners
-  document.querySelectorAll(".earn-actual-input").forEach(inp => {
-    inp.addEventListener("input", function() {
-      const ci = parseInt(this.dataset.ci);
-      const di = parseInt(this.dataset.di);
-      const val = this.value.trim();
-      actual[ci][di] = val === "" ? null : parseFloat(val) || 0;
-      save();
-      render();
-      // Reopen the cycle
-      const cyc = document.getElementById("cycle-" + ci);
-      if (cyc) { cyc.classList.add("open"); }
-    });
-  });
-
-  // Restore open states
-  openCycles.forEach(ci => {
-    const el = document.getElementById("cycle-" + ci);
-    if (el) el.classList.add("open");
-  });
-}
-
-const openCycles = new Set();
-
-function toggleCycle(ci) {
-  const el = document.getElementById("cycle-" + ci);
-  if (!el) return;
-  el.classList.toggle("open");
-  if (el.classList.contains("open")) openCycles.add(ci);
-  else openCycles.delete(ci);
-}
-
-// Open first cycle by default
-openCycles.add(0);
-render();
-</script>
-</body>
-</html>
+      { date: "23 Mar", day: "Mon", type: "wor
