@@ -841,4 +841,764 @@
 
   <!-- Install Banner -->
   <div class="install-banner" id="install-banner">
-    <p>📱 Add to Home Screen
+    <p>📱 Add to Home Screen for app experience!</p>
+    <button class="install-btn" id="install-btn">INSTALL</button>
+    <button class="install-dismiss" id="install-dismiss">✕</button>
+  </div>
+
+  <!-- Offline Banner -->
+  <div class="offline-banner" id="offline-banner">📵 You're offline — data is saved locally</div>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <h1>PAY TRACKER</h1>
+      <p id="date-range">26 FEB → 1 APR 2026</p>
+    </div>
+    <div class="header-right">
+      <div class="total-label">Final Balance</div>
+      <div class="total-amount" id="grand-balance">$0</div>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="summary-grid">
+    <div class="summary-card earn">
+      <div class="s-label">Expected</div>
+      <div class="s-value" id="s-expected">$0</div>
+    </div>
+    <div class="summary-card actual">
+      <div class="s-label">Actual</div>
+      <div class="s-value" id="s-actual">$0</div>
+    </div>
+    <div class="summary-card expense">
+      <div class="s-label">Expenses</div>
+      <div class="s-value" id="s-expense">$0</div>
+    </div>
+    <div class="summary-card balance">
+      <div class="s-label">Net Balance</div>
+      <div class="s-value" id="s-balance">$0</div>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span>ACTUAL VS EXPECTED</span>
+      <span id="progress-pct">0%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Cycle Tabs -->
+  <div class="cycle-tabs" id="cycle-tabs"></div>
+
+  <!-- Cycle Contents -->
+  <div id="cycles-container"></div>
+
+  <div class="footer-note">💾 DATA SAVED AUTOMATICALLY · TAP DAY TO EDIT</div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">✓ Saved</div>
+
+<!-- Edit Day Modal -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <h3>Edit Day</h3>
+    <div id="modal-day-info" style="color: var(--muted); font-size: 12px; margin-bottom: 16px; font-family: 'DM Mono', monospace;"></div>
+    
+    <label style="font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; display: block; margin-bottom: 6px;">DATE</label>
+    <input type="text" class="modal-input" id="modal-date" placeholder="e.g., 26 Feb">
+    
+    <label style="font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; display: block; margin-bottom: 6px; margin-top: 12px;">DAY</label>
+    <input type="text" class="modal-input" id="modal-day-name" placeholder="e.g., Mon">
+    
+    <div class="day-type-select">
+      <div class="type-option" data-type="work">Work</div>
+      <div class="type-option" data-type="off">Off</div>
+      <div class="type-option" data-type="nowork">No Work</div>
+    </div>
+
+    <label style="font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; display: block; margin-bottom: 6px;">EXPECTED EARNING</label>
+    <input type="number" class="modal-input" id="modal-expected" placeholder="Expected amount">
+    
+    <label style="font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; display: block; margin-bottom: 6px; margin-top: 12px;">ACTUAL EARNING</label>
+    <input type="number" class="modal-input" id="modal-actual" placeholder="Actual amount (optional)">
+    
+    <label style="font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; display: block; margin-bottom: 6px; margin-top: 12px;">NOTE (OPTIONAL)</label>
+    <input type="text" class="modal-input" id="modal-note" placeholder="e.g., Sick day, Holiday...">
+    
+    <button class="delete-day-btn" onclick="deleteCurrentDay()">Delete This Day</button>
+    
+    <div class="modal-buttons">
+      <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn primary" onclick="saveDayEdit()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Cycle Modal -->
+<div class="modal-overlay" id="cycle-modal">
+  <div class="modal">
+    <h3>Edit Cycle</h3>
+    
+    <label style="font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; display: block; margin-bottom: 6px;">CYCLE NAME</label>
+    <input type="text" class="modal-input" id="modal-cycle-name" placeholder="e.g., Cycle 1">
+    
+    <label style="font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; display: block; margin-bottom: 6px; margin-top: 12px;">DATE RANGE</label>
+    <input type="text" class="modal-input" id="modal-cycle-dates" placeholder="e.g., 26 Feb – 5 Mar">
+    
+    <label style="font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; display: block; margin-bottom: 6px; margin-top: 12px;">PAYDAY</label>
+    <input type="text" class="modal-input" id="modal-cycle-payday" placeholder="e.g., Wed 8 Mar">
+    
+    <label style="font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; display: block; margin-bottom: 6px; margin-top: 12px;">EXPENSE DAYS</label>
+    <input type="number" class="modal-input" id="modal-cycle-expense-days" placeholder="Number of days">
+    
+    <label style="font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; display: block; margin-bottom: 6px; margin-top: 12px;">WARNING (OPTIONAL)</label>
+    <input type="text" class="modal-input" id="modal-cycle-warning" placeholder="e.g., Bike payment due...">
+    
+    <button class="delete-day-btn" onclick="deleteCurrentCycle()">Delete This Cycle</button>
+    
+    <div class="modal-buttons">
+      <button class="modal-btn secondary" onclick="closeCycleModal()">Cancel</button>
+      <button class="modal-btn primary" onclick="saveCycleEdit()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── PWA SERVICE WORKER ──────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'pay-tracker-v4';
+    const ASSETS = [self.location.href];
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
+      self.skipWaiting();
+    });
+    self.addEventListener('activate', e => {
+      e.waitUntil(caches.keys().then(keys =>
+        Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+      ));
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(
+        caches.match(e.request).then(r => r || fetch(e.request).then(res => {
+          const clone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+          return res;
+        }).catch(() => caches.match(e.request)))
+      );
+    });
+  `;
+  const blob = new Blob([swCode], {type: 'application/javascript'});
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(() => {});
+}
+
+// ─── INSTALL PROMPT ──────────────────────────────────────────────────────────
+let deferredPrompt;
+const installBanner = document.getElementById('install-banner');
+const installBtn = document.getElementById('install-btn');
+const dismissBtn = document.getElementById('install-dismiss');
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installBanner.classList.add('show');
+});
+
+installBtn.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  installBanner.classList.remove('show');
+});
+
+dismissBtn.addEventListener('click', () => installBanner.classList.remove('show'));
+
+// ─── OFFLINE DETECTION ───────────────────────────────────────────────────────
+const offlineBanner = document.getElementById('offline-banner');
+function updateOnline() {
+  offlineBanner.classList.toggle('show', !navigator.onLine);
+}
+window.addEventListener('online', updateOnline);
+window.addEventListener('offline', updateOnline);
+updateOnline();
+
+// ─── TOAST ───────────────────────────────────────────────────────────────────
+function showToast(msg = '✓ Saved') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// ─── DATA ────────────────────────────────────────────────────────────────────
+const DAILY_EXP = 48;
+const WIFE = 50;
+
+// Generate default cycles (Mon to next Wed = 10 days)
+function generateDefaultCycles() {
+  const cycles = [];
+  const startDate = new Date(2026, 1, 23); // Feb 23, 2026 (Monday)
+  
+  for (let i = 0; i < 5; i++) {
+    const cycleStart = new Date(startDate);
+    cycleStart.setDate(startDate.getDate() + (i * 10));
+    
+    const cycleEnd = new Date(cycleStart);
+    cycleEnd.setDate(cycleStart.getDate() + 9); // 10 days total
+    
+    const payday = new Date(cycleEnd);
+    payday.setDate(cycleEnd.getDate() + 3); // Payday is Wednesday after cycle ends
+    
+    const days = [];
+    const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    
+    for (let d = 0; d < 10; d++) {
+      const currentDate = new Date(cycleStart);
+      currentDate.setDate(cycleStart.getDate() + d);
+      
+      const dayOfWeek = currentDate.getDay();
+      const dayName = dayNames[(dayOfWeek + 6) % 7]; // Convert to Mon-Sun
+      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+      const dateStr = `${currentDate.getDate()} ${currentDate.toLocaleString('default', { month: 'short' })}`;
+      
+      days.push({
+        date: dateStr,
+        day: dayName,
+        type: isWeekend ? 'off' : 'work',
+        expected: isWeekend ? 100 : 200
+      });
+    }
+    
+    const formatDate = (date) => `${date.getDate()} ${date.toLocaleString('default', { month: 'short' })}`;
+    const formatPayday = (date) => {
+      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      return `${days[date.getDay()]} ${formatDate(date)}`;
+    };
+    
+    cycles.push({
+      num: i + 1,
+      label: `Cycle ${i + 1}`,
+      dates: `${formatDate(cycleStart)} – ${formatDate(cycleEnd)}`,
+      payday: formatPayday(payday),
+      days: days,
+      expenseDays: 10,
+      extras: [],
+      warning: null
+    });
+  }
+  
+  return cycles;
+}
+
+let cycles = [];
+let actual = [];
+let currentCycleIndex = 0;
+let editingDay = null;
+let editingCycle = null;
+
+// Load saved data
+function initData() {
+  try {
+    const saved = localStorage.getItem("pay_tracker_v4");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed.cycles && parsed.cycles.length > 0) {
+        cycles = parsed.cycles;
+        actual = parsed.actual || cycles.map(c => c.days.map(() => null));
+      } else {
+        cycles = generateDefaultCycles();
+        actual = cycles.map(c => c.days.map(() => null));
+      }
+    } else {
+      cycles = generateDefaultCycles();
+      actual = cycles.map(c => c.days.map(() => null));
+    }
+  } catch(e) {
+    console.error("Load error:", e);
+    cycles = generateDefaultCycles();
+    actual = cycles.map(c => c.days.map(() => null));
+  }
+}
+
+function save() {
+  try {
+    localStorage.setItem("pay_tracker_v4", JSON.stringify({ cycles, actual }));
+    showToast('✓ Saved');
+  } catch(e) { console.error("Save error:", e); }
+}
+
+// ─── CALCULATIONS ────────────────────────────────────────────────────────────
+function calcCycle(ci) {
+  const c = cycles[ci];
+  const expExp = c.days.reduce((s, d) => s + (parseFloat(d.expected) || 0), 0);
+  const actEarn = actual[ci].reduce((s, v) => s + (v !== null ? v : 0), 0);
+  const hasActual = actual[ci].some(v => v !== null);
+  const totalExp = (DAILY_EXP * c.expenseDays) + WIFE + 
+    c.extras.reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+  return { expExp, actEarn, hasActual, totalExp };
+}
+
+function calcAllBalances() {
+  let bf = 0;
+  return cycles.map((c, ci) => {
+    const { expExp, actEarn, hasActual, totalExp } = calcCycle(ci);
+    const earned = hasActual ? actEarn : expExp;
+    const balance = bf + earned - totalExp;
+    const result = { bf, earned, expExp, actEarn, hasActual, totalExp, balance };
+    bf = balance;
+    return result;
+  });
+}
+
+// ─── RENDER ──────────────────────────────────────────────────────────────────
+function updateDateRange() {
+  if (cycles.length === 0) return;
+  const first = cycles[0].dates.split('–')[0].trim();
+  const last = cycles[cycles.length - 1].dates.split('–')[1].trim();
+  document.getElementById('date-range').textContent = `${first} → ${last}`;
+}
+
+function renderTabs() {
+  const container = document.getElementById("cycle-tabs");
+  let html = cycles.map((c, i) => `
+    <div class="cycle-tab ${i === currentCycleIndex ? 'active' : ''}" onclick="switchCycle(${i})">
+      <button class="edit-cycle-btn" onclick="event.stopPropagation(); openCycleModal(${i})">✎</button>
+      <div class="tab-num">CYCLE ${c.num}</div>
+      <div class="tab-dates">${c.dates}</div>
+    </div>
+  `).join("");
+  
+  html += `<button class="add-cycle-btn" onclick="addNewCycle()">+ Add Cycle</button>`;
+  container.innerHTML = html;
+}
+
+function switchCycle(index) {
+  currentCycleIndex = index;
+  renderTabs();
+  renderCycles();
+}
+
+function renderCycles() {
+  const balances = calcAllBalances();
+  const container = document.getElementById("cycles-container");
+  container.innerHTML = "";
+
+  // Update summary
+  let totalExpected = 0, totalActual = 0, totalExpenses = 0;
+  cycles.forEach((c, ci) => {
+    const { expExp, actEarn, totalExp } = calcCycle(ci);
+    totalExpected += expExp;
+    totalActual += actEarn;
+    totalExpenses += totalExp;
+  });
+  
+  const finalBalance = balances.length > 0 ? balances[balances.length - 1].balance : 0;
+
+  document.getElementById("s-expected").textContent = "$" + totalExpected.toLocaleString();
+  document.getElementById("s-actual").textContent = "$" + totalActual.toLocaleString();
+  document.getElementById("s-expense").textContent = "$" + totalExpenses.toLocaleString();
+  document.getElementById("s-balance").textContent = "$" + Math.round(finalBalance).toLocaleString();
+  document.getElementById("grand-balance").textContent = "$" + Math.round(finalBalance).toLocaleString();
+
+  const pct = totalExpected > 0 ? Math.min(100, Math.round((totalActual / totalExpected) * 100)) : 0;
+  document.getElementById("progress-pct").textContent = pct + "%";
+  document.getElementById("progress-fill").style.width = pct + "%";
+
+  updateDateRange();
+
+  if (cycles.length === 0) {
+    container.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--muted);">No cycles yet. Click "Add Cycle" to start.</div>';
+    return;
+  }
+
+  // Render current cycle
+  const ci = currentCycleIndex;
+  const c = cycles[ci];
+  const b = balances[ci];
+  
+  const div = document.createElement("div");
+  div.className = "cycle-content active";
+
+  const warnHTML = c.warning ? `<div class="warning">⚠ ${c.warning}</div>` : "";
+
+  const dayRows = c.days.map((d, di) => {
+    const actVal = actual[ci][di];
+    const isNoWork = d.type === "nowork";
+    const isOff = d.type === "off";
+    const rowClass = isNoWork ? "no-work" : isOff ? "off-day" : "";
+    const badgeClass = isOff ? "off" : "";
+    const noteHTML = d.note ? `<span class="note-text">${d.note}</span>` : "";
+    
+    return `<tr class="${rowClass}" onclick="openEditModal(${ci}, ${di})" style="cursor: pointer;">
+      <td><span class="day-badge ${badgeClass}">${d.day}</span></td>
+      <td>
+        <div class="date-cell">
+          <span class="date-text">${d.date}</span>
+          <span class="edit-date-btn">✎ Edit</span>
+        </div>
+        ${noteHTML}
+      </td>
+      <td class="earn-expected" style="color: var(--accent); font-family: 'DM Mono', monospace;">$${d.expected || 0}</td>
+      <td style="color: var(--accent2); font-family: 'DM Mono', monospace; font-weight: 500;">
+        ${actVal !== null ? '$' + actVal : '—'}
+      </td>
+    </tr>`;
+  }).join("");
+
+  const expenseItemsHTML = c.extras.map((e, ei) => `
+    <div class="expense-item">
+      <input type="text" class="expense-label-input" value="${e.label}" 
+        onchange="updateExtraLabel(${ci}, ${ei}, this.value)" placeholder="Description">
+      <input type="number" class="expense-amount-input" value="${e.amount}" 
+        onchange="updateExtraAmount(${ci}, ${ei}, this.value)" placeholder="Amount">
+      <button class="expense-delete" onclick="deleteExtra(${ci}, ${ei})">×</button>
+    </div>
+  `).join("");
+
+  div.innerHTML = `
+    <div class="cycle-header">
+      <div class="cycle-title-row">
+        <div class="cycle-title">
+          ${c.label}
+          <button class="edit-title-btn" onclick="openCycleModal(${ci})">✎ Edit</button>
+        </div>
+        <div class="cycle-payday">
+          💰 ${c.payday}
+          <button class="edit-payday-btn" onclick="openCycleModal(${ci})">✎</button>
+        </div>
+      </div>
+      <div class="cycle-chips">
+        <span class="chip expected">EXP $${b.expExp}</span>
+        <span class="chip actual">ACT $${b.actEarn}</span>
+        <span class="chip balance">BAL $${Math.round(b.balance)}</span>
+      </div>
+    </div>
+    ${warnHTML}
+    <table class="day-table">
+      <thead><tr>
+        <th>Day</th><th>Date</th><th>Expected</th><th>Actual</th>
+      </tr></thead>
+      <tbody>${dayRows}</tbody>
+    </table>
+    <button class="add-day-btn" onclick="addNewDay(${ci})">+ Add Day to Cycle</button>
+    <div class="expense-section">
+      <div class="expense-header">
+        <h4>Expenses · ${c.expenseDays} days</h4>
+        <button class="add-expense-btn" onclick="addExtra(${ci})">+ Add Expense</button>
+      </div>
+      
+      <div class="expense-list" id="expense-list-${ci}">
+        ${expenseItemsHTML}
+      </div>
+
+      <div class="expense-grid">
+        <div class="expense-row">
+          <span class="e-label">🚬 Cigs ×${c.expenseDays}d</span>
+          <span class="e-amount">−$${18*c.expenseDays}</span>
+        </div>
+        <div class="expense-row">
+          <span class="e-label">🍱 Food ×${c.expenseDays}d</span>
+          <span class="e-amount">−$${20*c.expenseDays}</span>
+        </div>
+        <div class="expense-row">
+          <span class="e-label">⛽ Petrol ×${c.expenseDays}d</span>
+          <span class="e-amount">−$${10*c.expenseDays}</span>
+        </div>
+        <div class="expense-row">
+          <span class="e-label">💑 Wife</span>
+          <span class="e-amount">−$${WIFE}</span>
+        </div>
+      </div>
+
+      <div class="cycle-totals">
+        <div class="total-row"><span class="t-label">Bring Forward</span><span class="t-val bf">$${Math.round(b.bf)}</span></div>
+        <div class="total-row"><span class="t-label">Expected Earn</span><span class="t-val earned">$${b.expExp}</span></div>
+        <div class="total-row"><span class="t-label">Actual Earn</span><span class="t-val actual">$${b.actEarn}</span></div>
+        <div class="total-row"><span class="t-label">Total Deducted</span><span class="t-val deducted">−$${b.totalExp}</span></div>
+        <div class="total-row" style="grid-column:1/-1">
+          <span class="t-label">Balance After Payday</span>
+          <span class="t-val balance" style="font-size:28px;">$${Math.round(b.balance)}</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  container.appendChild(div);
+}
+
+// ─── CYCLE MANAGEMENT ────────────────────────────────────────────────────────
+function addNewCycle() {
+  const newNum = cycles.length > 0 ? Math.max(...cycles.map(c => c.num)) + 1 : 1;
+  const lastCycle = cycles[cycles.length - 1];
+  
+  let startDate;
+  if (lastCycle) {
+    const lastDate = lastCycle.dates.split('–')[1].trim();
+    // Parse and add one day
+    const parts = lastDate.split(' ');
+    const day = parseInt(parts[0]);
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = monthNames.indexOf(parts[1]);
+    const year = 2026;
+    startDate = new Date(year, month, day + 1);
+  } else {
+    startDate = new Date(2026, 1, 23);
+  }
+  
+  const cycleEnd = new Date(startDate);
+  cycleEnd.setDate(startDate.getDate() + 9);
+  
+  const payday = new Date(cycleEnd);
+  payday.setDate(cycleEnd.getDate() + 3);
+  
+  const formatDate = (date) => `${date.getDate()} ${date.toLocaleString('default', { month: 'short' })}`;
+  const formatPayday = (date) => {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    return `${days[date.getDay()]} ${formatDate(date)}`;
+  };
+  
+  const newCycle = {
+    num: newNum,
+    label: `Cycle ${newNum}`,
+    dates: `${formatDate(startDate)} – ${formatDate(cycleEnd)}`,
+    payday: formatPayday(payday),
+    days: [],
+    expenseDays: 10,
+    extras: [],
+    warning: null
+  };
+  
+  cycles.push(newCycle);
+  actual.push([]);
+  currentCycleIndex = cycles.length - 1;
+  save();
+  renderTabs();
+  renderCycles();
+  showToast('✓ Cycle added');
+}
+
+function openCycleModal(ci) {
+  editingCycle = ci;
+  const c = cycles[ci];
+  document.getElementById('modal-cycle-name').value = c.label;
+  document.getElementById('modal-cycle-dates').value = c.dates;
+  document.getElementById('modal-cycle-payday').value = c.payday;
+  document.getElementById('modal-cycle-expense-days').value = c.expenseDays;
+  document.getElementById('modal-cycle-warning').value = c.warning || '';
+  document.getElementById('cycle-modal').classList.add('show');
+}
+
+function closeCycleModal() {
+  document.getElementById('cycle-modal').classList.remove('show');
+  editingCycle = null;
+}
+
+function saveCycleEdit() {
+  if (editingCycle === null) return;
+  const c = cycles[editingCycle];
+  
+  c.label = document.getElementById('modal-cycle-name').value || c.label;
+  c.dates = document.getElementById('modal-cycle-dates').value || c.dates;
+  c.payday = document.getElementById('modal-cycle-payday').value || c.payday;
+  c.expenseDays = parseInt(document.getElementById('modal-cycle-expense-days').value) || c.expenseDays;
+  c.warning = document.getElementById('modal-cycle-warning').value || null;
+  
+  save();
+  closeCycleModal();
+  renderTabs();
+  renderCycles();
+}
+
+function deleteCurrentCycle() {
+  if (editingCycle === null) return;
+  if (!confirm('Are you sure you want to delete this entire cycle? This cannot be undone.')) return;
+  
+  cycles.splice(editingCycle, 1);
+  actual.splice(editingCycle, 1);
+  
+  if (currentCycleIndex >= cycles.length) {
+    currentCycleIndex = Math.max(0, cycles.length - 1);
+  }
+  
+  save();
+  closeCycleModal();
+  renderTabs();
+  renderCycles();
+  showToast('✓ Cycle deleted');
+}
+
+// ─── DAY MANAGEMENT ───────────────────────────────────────────────────────────
+function addNewDay(ci) {
+  const c = cycles[ci];
+  const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  
+  // Get last date
+  let lastDate;
+  if (c.days.length > 0) {
+    const lastDay = c.days[c.days.length - 1];
+    const parts = lastDay.date.split(' ');
+    const day = parseInt(parts[0]);
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = monthNames.indexOf(parts[1]);
+    lastDate = new Date(2026, month, day + 1);
+  } else {
+    const parts = c.dates.split('–')[0].trim().split(' ');
+    const day = parseInt(parts[0]);
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = monthNames.indexOf(parts[1]);
+    lastDate = new Date(2026, month, day);
+  }
+  
+  const dayOfWeek = lastDate.getDay();
+  const dayName = dayNames[(dayOfWeek + 6) % 7];
+  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+  const dateStr = `${lastDate.getDate()} ${lastDate.toLocaleString('default', { month: 'short' })}`;
+  
+  c.days.push({
+    date: dateStr,
+    day: dayName,
+    type: isWeekend ? 'off' : 'work',
+    expected: isWeekend ? 100 : 200
+  });
+  
+  actual[ci].push(null);
+  save();
+  renderCycles();
+  showToast('✓ Day added');
+}
+
+function openEditModal(ci, di) {
+  editingDay = { ci, di };
+  const day = cycles[ci].days[di];
+  const actVal = actual[ci][di];
+  
+  document.getElementById('modal-day-info').textContent = `Cycle ${cycles[ci].num} · Day ${di + 1} of ${cycles[ci].days.length}`;
+  document.getElementById('modal-date').value = day.date;
+  document.getElementById('modal-day-name').value = day.day;
+  document.getElementById('modal-expected').value = day.expected || 0;
+  document.getElementById('modal-actual').value = actVal !== null ? actVal : '';
+  document.getElementById('modal-note').value = day.note || '';
+  
+  // Set type selection
+  document.querySelectorAll('.type-option').forEach(opt => {
+    opt.classList.toggle('selected', opt.dataset.type === day.type);
+    opt.onclick = () => {
+      document.querySelectorAll('.type-option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      // Auto-update expected based on type
+      const expInput = document.getElementById('modal-expected');
+      if (opt.dataset.type === 'work') expInput.value = 200;
+      else if (opt.dataset.type === 'off') expInput.value = 100;
+      else expInput.value = 0;
+    };
+  });
+  
+  document.getElementById('edit-modal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('edit-modal').classList.remove('show');
+  editingDay = null;
+}
+
+function saveDayEdit() {
+  if (!editingDay) return;
+  const { ci, di } = editingDay;
+  const day = cycles[ci].days[di];
+  
+  const selectedType = document.querySelector('.type-option.selected')?.dataset.type || day.type;
+  const date = document.getElementById('modal-date').value.trim();
+  const dayName = document.getElementById('modal-day-name').value.trim();
+  const expected = parseFloat(document.getElementById('modal-expected').value) || 0;
+  const actualVal = document.getElementById('modal-actual').value;
+  const note = document.getElementById('modal-note').value;
+  
+  day.type = selectedType;
+  day.date = date || day.date;
+  day.day = dayName || day.day;
+  day.expected = expected;
+  day.note = note || undefined;
+  
+  if (actualVal.trim() === '') {
+    actual[ci][di] = null;
+  } else {
+    actual[ci][di] = parseFloat(actualVal) || 0;
+  }
+  
+  save();
+  closeModal();
+  renderCycles();
+}
+
+function deleteCurrentDay() {
+  if (!editingDay) return;
+  const { ci, di } = editingDay;
+  
+  if (!confirm('Delete this day?')) return;
+  
+  cycles[ci].days.splice(di, 1);
+  actual[ci].splice(di, 1);
+  
+  save();
+  closeModal();
+  renderCycles();
+  showToast('✓ Day deleted');
+}
+
+// ─── EXPENSE MANAGEMENT ──────────────────────────────────────────────────────
+function addExtra(ci) {
+  cycles[ci].extras.push({ label: "New Expense", amount: 0 });
+  save();
+  renderCycles();
+  setTimeout(() => {
+    const list = document.getElementById(`expense-list-${ci}`);
+    if (list) {
+      const inputs = list.querySelectorAll('.expense-label-input');
+      if (inputs.length > 0) inputs[inputs.length - 1].focus();
+    }
+  }, 50);
+}
+
+function updateExtraLabel(ci, ei, value) {
+  cycles[ci].extras[ei].label = value;
+  save();
+  renderCycles();
+}
+
+function updateExtraAmount(ci, ei, value) {
+  cycles[ci].extras[ei].amount = parseFloat(value) || 0;
+  save();
+  renderCycles();
+}
+
+function deleteExtra(ci, ei) {
+  if (confirm('Delete this expense?')) {
+    cycles[ci].extras.splice(ei, 1);
+    save();
+    renderCycles();
+  }
+}
+
+// Close modals on overlay click
+document.getElementById('edit-modal').addEventListener('click', (e) => {
+  if (e.target.id === 'edit-modal') closeModal();
+});
+document.getElementById('cycle-modal').addEventListener('click', (e) => {
+  if (e.target.id === 'cycle-modal') closeCycleModal();
+});
+
+// ─── INITIALIZE ──────────────────────────────────────────────────────────────
+initData();
+renderTabs();
+renderCycles();
+</script>
+</body>
+</html>
