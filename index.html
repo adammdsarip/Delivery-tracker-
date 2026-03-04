@@ -47,6 +47,7 @@
     --green: #4af0a0;
     --red: #f05060;
     --yellow: #f0c040;
+    --blue: #7a8fff;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -209,7 +210,7 @@
   .summary-card.earn::before { background: var(--accent); }
   .summary-card.actual::before { background: var(--accent2); }
   .summary-card.expense::before { background: var(--red); }
-  .summary-card.balance::before { background: #7a8fff; }
+  .summary-card.balance::before { background: var(--blue); }
 
   .summary-card .s-label {
     font-family: 'DM Mono', monospace;
@@ -229,7 +230,7 @@
   .summary-card.earn .s-value { color: var(--accent); }
   .summary-card.actual .s-value { color: var(--accent2); }
   .summary-card.expense .s-value { color: var(--red); }
-  .summary-card.balance .s-value { color: #7a8fff; }
+  .summary-card.balance .s-value { color: var(--blue); }
 
   /* Progress */
   .progress-wrap { margin: 0 0 28px; }
@@ -258,74 +259,166 @@
     transition: width 0.6s ease;
   }
 
-  /* Cycles */
-  .cycle {
+  /* Cycle Tabs */
+  .cycle-tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    margin-bottom: 20px;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  
+  .cycle-tabs::-webkit-scrollbar { display: none; }
+
+  .cycle-tab {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 16px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .cycle-tab:hover { border-color: var(--accent); }
+
+  .cycle-tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #000;
+  }
+
+  .cycle-tab .tab-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+  }
+
+  .cycle-tab .tab-dates {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    opacity: 0.7;
+    margin-top: 2px;
+  }
+
+  .edit-cycle-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: none;
+    border: none;
+    color: inherit;
+    opacity: 0.5;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 2px 4px;
+  }
+
+  .edit-cycle-btn:hover { opacity: 1; }
+
+  /* Cycle Content */
+  .cycle-content {
+    display: none;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 16px;
-    margin-bottom: 16px;
     overflow: hidden;
-    transition: border-color 0.2s;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .cycle-content.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .cycle-header {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0,0,0,0.2);
+  }
+
+  .cycle-title-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 16px;
-    cursor: pointer;
-    user-select: none;
-    gap: 8px;
+    gap: 12px;
     flex-wrap: wrap;
   }
 
   .cycle-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    letter-spacing: 1px;
+    color: var(--accent);
     display: flex;
     align-items: center;
     gap: 10px;
-    flex: 1;
-    min-width: 0;
   }
 
-  .cycle-num {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 13px;
-    background: var(--accent);
-    color: #000;
-    width: 28px; height: 28px;
-    border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
+  .edit-title-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
   }
 
-  .cycle-info { min-width: 0; }
-  .cycle-info .ci-title { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .cycle-dates { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
+  .edit-title-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .cycle-payday {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--accent2);
+    background: rgba(74,240,160,0.1);
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(74,240,160,0.3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .edit-payday-btn {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    font-size: 10px;
+    opacity: 0.6;
+  }
+
+  .edit-payday-btn:hover { opacity: 1; }
 
   .cycle-chips {
     display: flex;
-    gap: 6px;
-    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
     flex-wrap: wrap;
   }
 
   .chip {
     font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    padding: 3px 8px;
+    font-size: 11px;
+    padding: 4px 10px;
     border-radius: 20px;
     font-weight: 500;
   }
 
   .chip.expected { background: rgba(240,192,64,0.12); color: var(--accent); border: 1px solid rgba(240,192,64,0.25); }
   .chip.actual { background: rgba(74,240,160,0.12); color: var(--accent2); border: 1px solid rgba(74,240,160,0.25); }
-  .chip.balance { background: rgba(122,143,255,0.12); color: #7a8fff; border: 1px solid rgba(122,143,255,0.25); }
-
-  .chevron { color: var(--muted); font-size: 16px; transition: transform 0.25s; flex-shrink: 0; }
-  .cycle.open .chevron { transform: rotate(180deg); }
-
-  .cycle-body { display: none; border-top: 1px solid var(--border); }
-  .cycle.open .cycle-body { display: block; }
+  .chip.balance { background: rgba(122,143,255,0.12); color: var(--blue); border: 1px solid rgba(122,143,255,0.25); }
 
   /* Day table */
   .day-table { width: 100%; border-collapse: collapse; }
@@ -336,13 +429,14 @@
     letter-spacing: 1px;
     text-transform: uppercase;
     color: var(--muted);
-    padding: 10px 12px 8px;
+    padding: 12px;
     text-align: left;
     border-bottom: 1px solid var(--border);
+    background: var(--surface2);
   }
 
   .day-table td {
-    padding: 10px 12px;
+    padding: 12px;
     font-size: 13px;
     border-bottom: 1px solid rgba(42,48,69,0.5);
     vertical-align: middle;
@@ -356,7 +450,7 @@
   .day-badge {
     font-family: 'DM Mono', monospace;
     font-size: 10px;
-    padding: 3px 7px;
+    padding: 4px 8px;
     border-radius: 4px;
     background: var(--surface2);
     color: var(--muted);
@@ -364,42 +458,131 @@
 
   .day-badge.off { background: rgba(240,192,64,0.1); color: var(--yellow); }
 
-  .earn-expected { color: var(--accent); font-family: 'DM Mono', monospace; font-size: 13px; }
+  .date-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
 
-  .earn-actual-input {
+  .date-text {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .edit-date-btn {
+    font-size: 10px;
+    color: var(--accent);
+    cursor: pointer;
+    opacity: 0.6;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .edit-date-btn:hover { opacity: 1; }
+
+  .earn-input {
     background: var(--surface2);
     border: 1px solid var(--border);
     border-radius: 6px;
-    color: var(--accent2);
+    color: var(--text);
     font-family: 'DM Mono', monospace;
     font-size: 13px;
-    padding: 5px 8px;
-    width: 80px;
+    padding: 6px 8px;
+    width: 70px;
     outline: none;
-    transition: border-color 0.2s;
+    transition: all 0.2s;
     -webkit-appearance: none;
   }
 
-  .earn-actual-input:focus { border-color: var(--accent2); }
-  .earn-actual-input::placeholder { color: var(--muted); }
+  .earn-input:focus { border-color: var(--accent); }
+  .earn-input.expected { color: var(--accent); }
+  .earn-input.actual { color: var(--accent2); }
+  .earn-input::placeholder { color: var(--muted); }
 
-  .note-text { font-size: 10px; color: var(--red); font-family: 'DM Mono', monospace; display: block; }
+  .note-text { font-size: 10px; color: var(--red); font-family: 'DM Mono', monospace; display: block; margin-top: 2px; }
 
   /* Expense section */
-  .expense-section {
-    border-top: 1px solid var(--border);
-    padding: 14px 16px;
-    background: rgba(0,0,0,0.2);
+  .expense-section { padding: 16px; background: rgba(0,0,0,0.2); }
+
+  .expense-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
   }
 
   .expense-section h4 {
     font-family: 'DM Mono', monospace;
-    font-size: 10px;
+    font-size: 11px;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--muted);
-    margin-bottom: 12px;
   }
+
+  .add-expense-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .add-expense-btn:hover {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+  }
+
+  .expense-list { margin-bottom: 16px; }
+
+  .expense-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    animation: slideIn 0.2s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .expense-item input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    padding: 8px 10px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .expense-item input:focus { border-color: var(--red); }
+
+  .expense-item .expense-label-input { flex: 1; min-width: 0; }
+  .expense-item .expense-amount-input {
+    width: 80px;
+    font-family: 'DM Mono', monospace;
+    color: var(--red);
+  }
+
+  .expense-delete {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px;
+    transition: color 0.2s;
+  }
+
+  .expense-delete:hover { color: var(--danger); }
 
   .expense-grid {
     display: grid;
@@ -414,12 +597,12 @@
     align-items: center;
     font-size: 12px;
     background: var(--surface2);
-    padding: 8px 10px;
+    padding: 10px;
     border-radius: 8px;
     gap: 6px;
   }
 
-  .expense-row .e-label { color: var(--muted); font-size: 11px; }
+  .expense-row .e-label { color: var(--muted); font-size: 11px; display: flex; align-items: center; gap: 6px; }
   .expense-row .e-amount { color: var(--red); font-family: 'DM Mono', monospace; font-size: 12px; white-space: nowrap; }
   .expense-row .e-amount.special { color: #ff8c60; font-weight: 600; }
 
@@ -428,8 +611,8 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
-    margin-top: 8px;
-    padding-top: 14px;
+    margin-top: 16px;
+    padding-top: 16px;
     border-top: 1px dashed var(--border);
   }
 
@@ -444,7 +627,7 @@
   }
 
   .total-row .t-val { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; }
-  .t-val.bf { color: #7a8fff; }
+  .t-val.bf { color: var(--blue); }
   .t-val.earned { color: var(--accent); }
   .t-val.actual { color: var(--accent2); }
   .t-val.deducted { color: var(--red); }
@@ -455,11 +638,11 @@
     background: rgba(240,80,96,0.08);
     border: 1px solid rgba(240,80,96,0.3);
     border-radius: 10px;
-    padding: 10px 14px;
+    padding: 12px 14px;
     font-size: 12px;
     color: var(--red);
     font-family: 'DM Mono', monospace;
-    margin: 12px 12px 0;
+    margin: 0 16px 16px;
   }
 
   /* Footer */
@@ -491,6 +674,166 @@
   }
 
   .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+  }
+
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    width: 100%;
+    max-width: 400px;
+    animation: modalIn 0.2s ease;
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .modal h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    color: var(--accent);
+  }
+
+  .modal-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 12px;
+    margin-bottom: 12px;
+    outline: none;
+  }
+
+  .modal-input:focus { border-color: var(--accent); }
+
+  .modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .modal-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .modal-btn.primary {
+    background: var(--accent);
+    color: #000;
+  }
+
+  .modal-btn.secondary {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .day-type-select {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .type-option {
+    flex: 1;
+    padding: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+  }
+
+  .type-option:hover { border-color: var(--accent); }
+  .type-option.selected {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+  }
+
+  .add-day-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--surface2);
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: all 0.2s;
+  }
+
+  .add-day-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .delete-day-btn {
+    background: rgba(240,80,96,0.1);
+    border: 1px solid rgba(240,80,96,0.3);
+    color: var(--red);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    margin-top: 16px;
+    width: 100%;
+  }
+
+  .delete-day-btn:hover {
+    background: rgba(240,80,96,0.2);
+  }
+
+  .add-cycle-btn {
+    background: var(--surface2);
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 10px 16px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    transition: all 0.2s;
+  }
+
+  .add-cycle-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 </style>
 </head>
 <body>
@@ -498,392 +841,4 @@
 
   <!-- Install Banner -->
   <div class="install-banner" id="install-banner">
-    <p>📱 Add to Home Screen for app experience!</p>
-    <button class="install-btn" id="install-btn">INSTALL</button>
-    <button class="install-dismiss" id="install-dismiss">✕</button>
-  </div>
-
-  <!-- Offline Banner -->
-  <div class="offline-banner" id="offline-banner">📵 You're offline — data is saved locally</div>
-
-  <!-- Header -->
-  <div class="header">
-    <div class="header-left">
-      <h1>PAY TRACKER</h1>
-      <p>26 FEB → 1 APR 2026</p>
-    </div>
-    <div class="header-right">
-      <div class="total-label">Balance 1 Apr</div>
-      <div class="total-amount" id="grand-balance">$2,336</div>
-    </div>
-  </div>
-
-  <!-- Summary Cards -->
-  <div class="summary-grid">
-    <div class="summary-card earn">
-      <div class="s-label">Expected</div>
-      <div class="s-value" id="s-expected">$5,300</div>
-    </div>
-    <div class="summary-card actual">
-      <div class="s-label">Actual</div>
-      <div class="s-value" id="s-actual">$0</div>
-    </div>
-    <div class="summary-card expense">
-      <div class="s-label">Expenses</div>
-      <div class="s-value" id="s-expense">$2,964</div>
-    </div>
-    <div class="summary-card balance">
-      <div class="s-label">Net Balance</div>
-      <div class="s-value" id="s-balance">$2,336</div>
-    </div>
-  </div>
-
-  <!-- Progress -->
-  <div class="progress-wrap">
-    <div class="progress-label">
-      <span>ACTUAL VS EXPECTED</span>
-      <span id="progress-pct">0%</span>
-    </div>
-    <div class="progress-bar">
-      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
-    </div>
-  </div>
-
-  <!-- Cycles -->
-  <div id="cycles-container"></div>
-
-  <div class="footer-note">💾 DATA SAVED AUTOMATICALLY · TAP CYCLE TO EXPAND</div>
-</div>
-
-<!-- Toast -->
-<div class="toast" id="toast">✓ Saved</div>
-
-<script>
-// ─── PWA SERVICE WORKER ──────────────────────────────────────────────────────
-if ('serviceWorker' in navigator) {
-  const swCode = `
-    const CACHE = 'pay-tracker-v1';
-    const ASSETS = [self.location.href];
-    self.addEventListener('install', e => {
-      e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
-      self.skipWaiting();
-    });
-    self.addEventListener('activate', e => {
-      e.waitUntil(caches.keys().then(keys =>
-        Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-      ));
-    });
-    self.addEventListener('fetch', e => {
-      e.respondWith(
-        caches.match(e.request).then(r => r || fetch(e.request).then(res => {
-          const clone = res.clone();
-          caches.open(CACHE).then(c => c.put(e.request, clone));
-          return res;
-        }).catch(() => caches.match(e.request)))
-      );
-    });
-  `;
-  const blob = new Blob([swCode], {type: 'application/javascript'});
-  const swUrl = URL.createObjectURL(blob);
-  navigator.serviceWorker.register(swUrl).catch(() => {});
-}
-
-// ─── INSTALL PROMPT ──────────────────────────────────────────────────────────
-let deferredPrompt;
-const installBanner = document.getElementById('install-banner');
-const installBtn = document.getElementById('install-btn');
-const dismissBtn = document.getElementById('install-dismiss');
-
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredPrompt = e;
-  installBanner.classList.add('show');
-});
-
-installBtn.addEventListener('click', async () => {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  deferredPrompt = null;
-  installBanner.classList.remove('show');
-});
-
-dismissBtn.addEventListener('click', () => installBanner.classList.remove('show'));
-
-// ─── OFFLINE DETECTION ───────────────────────────────────────────────────────
-const offlineBanner = document.getElementById('offline-banner');
-function updateOnline() {
-  offlineBanner.classList.toggle('show', !navigator.onLine);
-}
-window.addEventListener('online', updateOnline);
-window.addEventListener('offline', updateOnline);
-updateOnline();
-
-// ─── TOAST ───────────────────────────────────────────────────────────────────
-function showToast(msg = '✓ Saved') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 1800);
-}
-
-// ─── DATA ────────────────────────────────────────────────────────────────────
-const DAILY_EXP = 48;
-const WIFE = 50;
-
-const cycles = [
-  {
-    num: 1, label: "Cycle 1", dates: "26 Feb – 1 Mar", payday: "Wed 4 Mar",
-    days: [
-      { date: "26 Feb", day: "Wed", type: "work" },
-      { date: "27 Feb", day: "Thu", type: "work" },
-      { date: "28 Feb", day: "Fri", type: "work" },
-      { date: "1 Mar",  day: "Sat", type: "work" },
-      { date: "2 Mar",  day: "Sun", type: "off" },
-    ],
-    expenseDays: 5, extras: [], warning: null
-  },
-  {
-    num: 2, label: "Cycle 2", dates: "2 Mar – 8 Mar", payday: "Wed 11 Mar",
-    days: [
-      { date: "2 Mar",  day: "Mon", type: "work" },
-      { date: "3 Mar",  day: "Tue", type: "work" },
-      { date: "4 Mar",  day: "Wed", type: "work" },
-      { date: "5 Mar",  day: "Thu", type: "work" },
-      { date: "6 Mar",  day: "Fri", type: "work" },
-      { date: "7 Mar",  day: "Sat", type: "work" },
-      { date: "8 Mar",  day: "Sun", type: "off" },
-    ],
-    expenseDays: 8,
-    extras: [{ label: "🏍️ Bike Payment (10 Mar)", amount: 450 }],
-    warning: "Bike payment $450 due 10 Mar. Don't overspend after 4 Mar payday!"
-  },
-  {
-    num: 3, label: "Cycle 3", dates: "9 Mar – 15 Mar", payday: "Wed 18 Mar",
-    days: [
-      { date: "9 Mar",  day: "Mon", type: "work" },
-      { date: "10 Mar", day: "Tue", type: "work" },
-      { date: "11 Mar", day: "Wed", type: "work" },
-      { date: "12 Mar", day: "Thu", type: "work" },
-      { date: "13 Mar", day: "Fri", type: "work" },
-      { date: "14 Mar", day: "Sat", type: "work" },
-      { date: "15 Mar", day: "Sun", type: "off" },
-    ],
-    expenseDays: 8,
-    extras: [{ label: "💳 Loan Payment (12 Mar)", amount: 188 }],
-    warning: null
-  },
-  {
-    num: 4, label: "Cycle 4", dates: "16 Mar – 22 Mar", payday: "Wed 25 Mar",
-    days: [
-      { date: "16 Mar", day: "Mon", type: "work" },
-      { date: "17 Mar", day: "Tue", type: "work" },
-      { date: "18 Mar", day: "Wed", type: "work" },
-      { date: "19 Mar", day: "Thu", type: "work" },
-      { date: "20 Mar", day: "Fri", type: "work" },
-      { date: "21 Mar", day: "Sat", type: "nowork", note: "Cannot work" },
-      { date: "22 Mar", day: "Sun", type: "off" },
-    ],
-    expenseDays: 8,
-    extras: [{ label: "✈️ Batam Trip (24–26 Mar)", amount: 300 }],
-    warning: null
-  },
-  {
-    num: 5, label: "Cycle 5", dates: "23 Mar – 29 Mar", payday: "Wed 1 Apr",
-    days: [
-      { date: "23 Mar", day: "Mon", type: "work" },
-      { date: "24 Mar", day: "Tue", type: "nowork", note: "Batam Day 1" },
-      { date: "25 Mar", day: "Wed", type: "nowork", note: "Batam Day 2" },
-      { date: "26 Mar", day: "Thu", type: "nowork", note: "Batam Day 3" },
-      { date: "27 Mar", day: "Fri", type: "work" },
-      { date: "28 Mar", day: "Sat", type: "work" },
-      { date: "29 Mar", day: "Sun", type: "off" },
-    ],
-    expenseDays: 8, extras: [],
-    warning: "Only 4 earning days this cycle due to Batam trip."
-  }
-];
-
-function expectedEarn(type) {
-  if (type === "work") return 200;
-  if (type === "off") return 100;
-  return 0;
-}
-
-// ─── STATE ───────────────────────────────────────────────────────────────────
-const actual = cycles.map(c => c.days.map(() => null));
-
-try {
-  const saved = localStorage.getItem("pay_tracker_v2");
-  if (saved) {
-    const parsed = JSON.parse(saved);
-    parsed.forEach((row, ci) => row && row.forEach((val, di) => {
-      if (actual[ci] && actual[ci][di] !== undefined) actual[ci][di] = val;
-    }));
-  }
-} catch(e) {}
-
-function save() {
-  try {
-    localStorage.setItem("pay_tracker_v2", JSON.stringify(actual));
-    showToast('✓ Saved');
-  } catch(e) {}
-}
-
-// ─── CALC ────────────────────────────────────────────────────────────────────
-function calcCycle(ci) {
-  const c = cycles[ci];
-  const expExp = c.days.reduce((s, d) => s + expectedEarn(d.type), 0);
-  const actEarn = actual[ci].reduce((s, v) => s + (v !== null ? v : 0), 0);
-  const hasActual = actual[ci].some(v => v !== null);
-  const totalExp = (DAILY_EXP * c.expenseDays) + WIFE + c.extras.reduce((s, e) => s + e.amount, 0);
-  return { expExp, actEarn, hasActual, totalExp };
-}
-
-function calcAllBalances() {
-  let bf = 0;
-  const results = [];
-  cycles.forEach((c, ci) => {
-    const { expExp, actEarn, hasActual, totalExp } = calcCycle(ci);
-    const earned = hasActual ? actEarn : expExp;
-    const balance = bf + earned - totalExp;
-    results.push({ bf, earned, expExp, actEarn, hasActual, totalExp, balance });
-    bf = balance;
-  });
-  return results;
-}
-
-// ─── RENDER ──────────────────────────────────────────────────────────────────
-const openCycles = new Set([0]);
-
-function render() {
-  const balances = calcAllBalances();
-  const container = document.getElementById("cycles-container");
-  container.innerHTML = "";
-
-  let totalExpected = 0, totalActual = 0, totalExpenses = 0;
-  cycles.forEach((c, ci) => {
-    const { expExp, actEarn, totalExp } = calcCycle(ci);
-    totalExpected += expExp;
-    totalActual += actEarn;
-    totalExpenses += totalExp;
-  });
-
-  const finalBalance = balances[balances.length - 1].balance;
-
-  document.getElementById("s-expected").textContent = "$" + totalExpected.toLocaleString();
-  document.getElementById("s-actual").textContent = "$" + totalActual.toLocaleString();
-  document.getElementById("s-expense").textContent = "$" + totalExpenses.toLocaleString();
-  document.getElementById("s-balance").textContent = "$" + Math.round(finalBalance).toLocaleString();
-  document.getElementById("grand-balance").textContent = "$" + Math.round(finalBalance).toLocaleString();
-
-  const pct = totalExpected > 0 ? Math.min(100, Math.round((totalActual / totalExpected) * 100)) : 0;
-  document.getElementById("progress-pct").textContent = pct + "%";
-  document.getElementById("progress-fill").style.width = pct + "%";
-
-  cycles.forEach((c, ci) => {
-    const b = balances[ci];
-    const div = document.createElement("div");
-    div.className = "cycle" + (openCycles.has(ci) ? " open" : "");
-    div.id = "cycle-" + ci;
-
-    const warnHTML = c.warning ? `<div class="warning">⚠ ${c.warning}</div>` : "";
-
-    const dayRows = c.days.map((d, di) => {
-      const exp = expectedEarn(d.type);
-      const actVal = actual[ci][di];
-      const isNoWork = d.type === "nowork";
-      const isOff = d.type === "off";
-      const rowClass = isNoWork ? "no-work" : isOff ? "off-day" : "";
-      const badgeClass = isOff ? "off" : "";
-      const noteHTML = d.note ? `<span class="note-text">${d.note}</span>` : "";
-      const inputHTML = isNoWork
-        ? `<span style="color:var(--red);font-family:'DM Mono',monospace;font-size:12px;">$0</span>`
-        : `<input class="earn-actual-input" type="number" inputmode="numeric" placeholder="—"
-            data-ci="${ci}" data-di="${di}"
-            value="${actVal !== null ? actVal : ''}"
-            min="0" step="1">`;
-      return `<tr class="${rowClass}">
-        <td><span class="day-badge ${badgeClass}">${d.day}</span></td>
-        <td style="color:var(--muted);font-size:12px;">${d.date}${noteHTML}</td>
-        <td class="earn-expected">$${exp}</td>
-        <td>${inputHTML}</td>
-      </tr>`;
-    }).join("");
-
-    const expRowsHTML = c.extras.map(e =>
-      `<div class="expense-row"><span class="e-label">${e.label}</span><span class="e-amount special">−$${e.amount}</span></div>`
-    ).join("");
-
-    div.innerHTML = `
-      <div class="cycle-header" onclick="toggleCycle(${ci})">
-        <div class="cycle-title">
-          <div class="cycle-num">${c.num}</div>
-          <div class="cycle-info">
-            <div class="ci-title">${c.label} · ${c.dates}</div>
-            <div class="cycle-dates">📅 Payday: ${c.payday}</div>
-          </div>
-        </div>
-        <div class="cycle-chips">
-          <span class="chip expected">E $${b.expExp}</span>
-          <span class="chip actual">A $${b.actEarn}</span>
-          <span class="chip balance">B $${Math.round(b.balance)}</span>
-        </div>
-        <div class="chevron">▾</div>
-      </div>
-      <div class="cycle-body">
-        ${warnHTML}
-        <table class="day-table">
-          <thead><tr>
-            <th>Day</th><th>Date</th><th>Expect</th><th>Actual</th>
-          </tr></thead>
-          <tbody>${dayRows}</tbody>
-        </table>
-        <div class="expense-section">
-          <h4>Expenses · ${c.expenseDays} days till payday</h4>
-          <div class="expense-grid">
-            <div class="expense-row"><span class="e-label">🚬 Cigs ×${c.expenseDays}d</span><span class="e-amount">−$${18*c.expenseDays}</span></div>
-            <div class="expense-row"><span class="e-label">🍱 Food ×${c.expenseDays}d</span><span class="e-amount">−$${20*c.expenseDays}</span></div>
-            <div class="expense-row"><span class="e-label">⛽ Petrol ×${c.expenseDays}d</span><span class="e-amount">−$${10*c.expenseDays}</span></div>
-            <div class="expense-row"><span class="e-label">💑 Wife</span><span class="e-amount">−$${WIFE}</span></div>
-            ${expRowsHTML}
-          </div>
-          <div class="cycle-totals">
-            <div class="total-row"><span class="t-label">Bring Fwd</span><span class="t-val bf">$${Math.round(b.bf)}</span></div>
-            <div class="total-row"><span class="t-label">Exp Earn</span><span class="t-val earned">$${b.expExp}</span></div>
-            <div class="total-row"><span class="t-label">Act Earn</span><span class="t-val actual">$${b.actEarn}</span></div>
-            <div class="total-row"><span class="t-label">Deducted</span><span class="t-val deducted">−$${b.totalExp}</span></div>
-            <div class="total-row" style="grid-column:1/-1"><span class="t-label">Balance After Payday</span><span class="t-val balance" style="font-size:28px;">$${Math.round(b.balance)}</span></div>
-          </div>
-        </div>
-      </div>`;
-
-    container.appendChild(div);
-  });
-
-  document.querySelectorAll(".earn-actual-input").forEach(inp => {
-    inp.addEventListener("change", function() {
-      const ci = parseInt(this.dataset.ci);
-      const di = parseInt(this.dataset.di);
-      const val = this.value.trim();
-      actual[ci][di] = val === "" ? null : parseFloat(val) || 0;
-      save();
-      render();
-      const cyc = document.getElementById("cycle-" + ci);
-      if (cyc) cyc.classList.add("open");
-    });
-  });
-}
-
-function toggleCycle(ci) {
-  const el = document.getElementById("cycle-" + ci);
-  if (!el) return;
-  el.classList.toggle("open");
-  if (el.classList.contains("open")) openCycles.add(ci);
-  else openCycles.delete(ci);
-}
-
-render();
-</script>
-</body>
-</html>
+    <p>📱 Add to Home Screen
